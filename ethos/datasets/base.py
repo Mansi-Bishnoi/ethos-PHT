@@ -15,9 +15,15 @@ class TimelineDataset(th.utils.data.Dataset):
         self.times: th.Tensor = data["times"]
         self.tokens: th.Tensor = data["tokens"]
         self.patient_context: th.Tensor = data["patient_context"]
+        print("Patient Context Sample:", self.patient_context[:4])
+
         self.age_reference: Sequence[np.ndarray[np.float64]] = data["age_reference"]
+        print("Age Reference Sample:", self.age_reference[:4])  
+
         self.patient_offsets: np.ndarray[np.int64] = data["patient_data_offsets"]
         self.patient_ids: np.ndarray = data["patient_ids"]
+          
+
         # if ids are bytes, convert them to string to be able to use .item() later
         if isinstance(self.patient_ids[0], bytes):
             self.patient_ids = self.patient_ids.astype("U")

@@ -21,8 +21,9 @@ logger = get_logger()
 def load_and_process_data(
     data_prop: DataProp, vocab: Vocabulary, use_cache=False, **kwargs
 ) -> dict[int, list]:
-    patient_timeline_chunks: dict[int, list] = defaultdict(list)
 
+    patient_timeline_chunks: dict[int, list] = defaultdict(list)
+    
     module = import_module(f".{data_prop.module}.preprocessors", package="ethos.tokenize")
     registered_data = [
         cls
@@ -36,6 +37,19 @@ def load_and_process_data(
         data.process()
         prev_vocab_size = len(vocab)
         new_timelines = data.get_timelines()
+        
+        def process_events(events, itos):
+        # Ensure 'itos' is defined before using it
+          def get_event_label(event_id):
+           return itos.get(event_id, f"UNKNOWN_EVENT_{event_id}")
+        print(f"\n[DEBUG] Raw EHR Data for {data_cls.__name__}:")
+        for patient_id, (times, events) in new_timelines.items():
+                
+    
+                print(f"Patient ID: {patient_id}")
+                print(f"Times: {times}")
+                print(f"Events: {events}")
+                break  # Print only the first patient to avoid flooding logs
 
         for patient_id, (times, events) in new_timelines.items():
             patient_timeline_chunks[patient_id].append((times, events))
@@ -50,6 +64,14 @@ def load_and_process_data(
             )
         )
     return patient_timeline_chunks
+
+def process_events(events, itos):
+    decoded_events = [itos.get(event, f"UNKNOWN ({event})") for event in events]
+    
+    # Debugging
+    print(f"Decoded Events: {decoded_events}")
+    
+    return decoded_events
 
 
 def merge_timeline_chunks(patient_timeline_chunks) -> dict[int, tuple[np.ndarray, np.ndarray]]:

@@ -1,0 +1,16 @@
+[
+    {
+        "expected": 0,
+        "actual": "_=6mt",
+        "stop_reason": "time_limit",
+        "actual_prob": 0.05413670465350151,
+        "INPATIENT_ADMISSION_START": 1.4838829720531521e-08,
+        "_DEATH": 1.643316522859095e-07,
+        "_TIMELINE_END": 0.09963647276163101,
+        "patient_id": 10014354,
+        "patient_age": 61.859153747558594,
+        "discharge_token_idx": 40919,
+        "token_dist": 1,
+        "token_time": 0.4928131416837782
+    }
+]

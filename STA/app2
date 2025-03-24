@@ -1,0 +1,45 @@
+import h5py
+import pickle
+from datetime import datetime
+from bisect import bisect
+
+file_path = "/home/shtlp_0094/workspace/ethos-paper/ethos/data/tokenized_datasets/mimic_test_timelines_p10.hdf5"  # Update with your actual file path
+vocab_pkl_path = "/home/shtlp_0094/workspace/ethos-paper/ethos/data/tokenized_datasets/mimic_vocab_t763.pkl"      # Update with actual path
+
+with h5py.File(file_path, "r") as f:
+    event_times = f["times"][:]   # Unix timestamps
+    event_tokens = f["tokens"][:] # Encoded token IDs
+
+print(f"Loaded {len(event_times)} timestamps from HDF5")
+print(f"Sample timestamps: {event_times[:5]}")
+print(f"Loaded {len(event_tokens)} tokens from HDF5")
+print(f"Sample tokens: {event_tokens[:5]}")
+
+# Load vocab.pkl (Pickle file)
+with open(vocab_pkl_path, "rb") as f:
+    vocab = pickle.load(f)
+
+# Extract index-to-string mapping (itos)
+itos = vocab.get("itos", {})  # itos[index] gives the corresponding text
+
+print(f"Vocab size: {len(itos)}")
+print(f"Sample itos mappings: {list(itos.items())[:5]}")  # Print first 5 mappings
+
+
+# Convert times to readable format
+def convert_time(patient_idx, patient_age):
+    """Convert patient age at event time to actual date."""
+    event_year = age_reference[patient_idx] + patient_age
+    event_date = datetime(int(event_year), 1, 1)  # Assuming events occur at the start of the year
+    return event_date.strftime('%Y-%m-%d')
+
+
+# Debugging output
+print("\n===== Timeline Events =====")
+for i in range(len(event_times)):
+    token_id = event_tokens[i]
+    event_desc = itos.get(token_id, f"Event {token_id}")  # Convert token ID to text
+    event_date = convert_time(event_times[i])
+
+    print(f"Event {i}: Token {token_id} -> '{event_desc}' on {event_date}")  # Debug each conversion
+

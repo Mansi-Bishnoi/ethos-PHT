@@ -13,14 +13,29 @@ class MimicPatientBirthDateData(ContextData):
     def __init__(self, data_prop, **kwargs):
         super().__init__("hosp/patients", data_prop, use_cols=self.COLUMNS_WE_USE, **kwargs)
 
-    def _process(self, df: pd.DataFrame) -> pd.DataFrame:
-        df["anchor_year"] -= df["anchor_age"]
-        df.drop(columns="anchor_age", inplace=True)
-        df.anchor_year = pd.to_datetime(df.anchor_year, format="%Y")
-        df.anchor_year += pd.DateOffset(months=6)
-        # convert datetimes to year format
-        df.anchor_year = df.anchor_year.map(lambda v: v.timestamp() / SECONDS_IN_YEAR)
-        return df
+    def _process(self, df: pd.DataFrame) -> pd.DataFrame:     
+            # # Compute birth year
+            # print(f"times shape: {times.shape}")
+            # print(f"patient_birth_dates[{patient_id}] shape: {patient_birth_dates[patient_id].shape}")
+
+            # df["birth_year"] = df["anchor_year"] - df["anchor_age"]
+
+            # # Convert birth year to datetime for consistency (optional)
+            # df.birth_year = pd.to_datetime(df.birth_year, format="%Y")
+
+            # # Drop unnecessary columns
+            # df.drop(columns="anchor_age", inplace=True)
+
+            # return df
+
+
+         df["anchor_year"] -= df["anchor_age"]
+         df.drop(columns="anchor_age", inplace=True)
+         df.anchor_year = pd.to_datetime(df.anchor_year, format="%Y")
+         df.anchor_year += pd.DateOffset(months=6)
+         # convert datetimes to year format
+         df.anchor_year = df.anchor_year.map(lambda v: v.timestamp() / SECONDS_IN_YEAR)
+         return df
 
 
 class ICUStayIdMixin:

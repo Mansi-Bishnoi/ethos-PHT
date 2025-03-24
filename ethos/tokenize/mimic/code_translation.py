@@ -5,6 +5,7 @@ from ..translation_base import Translation
 from ...constants import PROJECT_DATA
 
 
+
 class DrugTranslation(Translation):
     def __init__(self, data_prop):
         self.data_prop = data_prop
@@ -22,6 +23,16 @@ class DrugTranslation(Translation):
         drug_to_gsn.gsn = drug_to_gsn.gsn.str.split(" ")
         drug_to_gsn = drug_to_gsn.explode("gsn")
         gsn_to_atc = self._load_gsn_to_atc().set_index("gsn").atc
+        
+        # Load GSN to Drug Name mapping
+        self._gsn_to_drug = (
+            drug_to_gsn[['gsn', 'drug']]
+            .dropna()
+            .drop_duplicates()
+            .set_index("gsn")
+            .to_dict()["drug"]
+        )
+        # Mapping Drug → GSN → ATC
         self._name_to_code = (
             drug_to_gsn.set_index("drug")
             .gsn.map(gsn_to_atc, na_action="ignore")
@@ -32,12 +43,24 @@ class DrugTranslation(Translation):
             .set_index("drug")
             .atc_code
         )
+        # DEBUG PRINT: Check Drug → ATC Mapping
+        print("Sample Drug to ATC Mapping:", self._name_to_code.head())
         return self._name_to_code
 
     def _create_code_to_name_translation(self) -> dict:
         if self._name_to_code is None:
             self._name_to_code = self._create_name_to_code_translation()
         return self._name_to_code.reset_index().set_index("atc_code").drug.to_dict()
+    
+    def get_gsn_to_drug_mapping(self) -> dict:
+        """Returns the GSN → Drug Name mapping."""
+        if self._gsn_to_drug is None:
+            self._create_name_to_code_translation()  # Ensure mapping is generated
+        
+        # DEBUG PRINT: Check if GSN to Drug Name mapping is working
+        print("Sample GSN to Drug Mapping:", list(self._gsn_to_drug.items())[:10])
+
+        return self._gsn_to_drug
 
     @staticmethod
     def _load_gsn_to_atc() -> pd.Series:

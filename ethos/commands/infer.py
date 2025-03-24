@@ -102,13 +102,23 @@ def infer(
     model_path = Path(model)
     model, block_size = load_model_from_checkpoint(model_path, device, for_training=False)
     logger.info(f"Model loaded (block_size={block_size})")
+    
+    #data_path = PROJECT_DATA / data
+    #fold = data_path.stem.split("_")[1]
+    #model_name = model_path.stem if model_name is None else model_name
+    #token_suffix = f"_{n_tokens}M_tokens" if n_tokens is not None else ""
+    #results_dir = Path(output) / f"{test.value}_{model_name}_{fold}{token_suffix}"
+    #results_dir.mkdir(parents=True, exist_ok=True)
 
+    # With these lines:
     data_path = PROJECT_DATA / data
-    fold = data_path.stem.split("_")[1]
+    try:
+        fold = data_path.stem.split("_")[1]
+    except IndexError:
+        fold = "default"  # Use a default value when no fold is specified
     model_name = model_path.stem if model_name is None else model_name
     token_suffix = f"_{n_tokens}M_tokens" if n_tokens is not None else ""
     results_dir = Path(output) / f"{test.value}_{model_name}_{fold}{token_suffix}"
-    results_dir.mkdir(parents=True, exist_ok=True)
 
     data = load_data(data_path, n_tokens=n_tokens * 1_000_000 if n_tokens is not None else None)
     data["times"].share_memory_()

@@ -36,7 +36,7 @@ class DataProp:
         return DataProp(
             name=dataset,
             fold=fold,
-            dataset_dir="mimic-iv-2.2_Data",
+            dataset_dir="mimic-iv-demo-2.2_Data",
             id_col="subject_id",
             fold_dir=fold.value,
             csv_format="csv.gz",

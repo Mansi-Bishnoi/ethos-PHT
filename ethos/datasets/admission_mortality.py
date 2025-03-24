@@ -22,10 +22,11 @@ class _AdmissionMortalityBase(InferenceDataset, abc.ABC):
         self.admission_indices = th.nonzero(self.tokens == admission_token).view(-1).numpy()
         tokens_of_interest = th.tensor(self.encode(toi_stokens).astype(int))
         self.toi_indices = th.nonzero(th.isin(self.tokens, tokens_of_interest)).view(-1).numpy()
-        # when a subset of data is used, the cut-off is done arbitrarily, so we need to make sure
+         # when a subset of data is used, the cut-off is done arbitrarily, so we need to make sure
         # that the last admission token is not included if it doesn't have a corresponding toi
         if self.admission_indices[-1] > self.toi_indices[-1]:
             self.admission_indices = self.admission_indices[:-1]
+        
         # precompute the corresponding toi indices for each admission
         self.admission_toi_indices = np.searchsorted(self.toi_indices, self.admission_indices)
 
